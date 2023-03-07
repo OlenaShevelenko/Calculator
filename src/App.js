@@ -1,5 +1,7 @@
 import './App.css';
 import { useState } from 'react';
+import * as math from 'mathjs';
+
 
 function App (){
   const [ calc, setCalc ] = useState ('');
@@ -17,8 +19,15 @@ function App (){
     }
     setCalc (calc + value);
 
-    if (!oprs.includes(value))
-          setResult(eval(calc + value).toString());        
+    if (!oprs.includes(value)) {
+      try {
+        const expr = math.compile(calc + value);
+        const result = expr.evaluate();
+        setResult(result.toString());
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 
   const createDigits = () => {
@@ -37,9 +46,14 @@ function App (){
   } 
 
   const calculate = () => {
-    setCalc(eval(calc).toString());
+    try {
+      const result = math.evaluate(calc);
+      setCalc(result.toString());
+    } catch (error) {
+      console.error(error);
+    }
   }
-
+  
   const deleteLast = () => {
     if (calc === '') {
       return;
